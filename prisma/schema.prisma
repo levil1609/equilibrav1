@@ -1,0 +1,56 @@
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://admin:admin@localhost:5432/db_equilibra"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Usuario {
+  id_usuario  Int    @id @default(autoincrement())
+  usuario     String @unique
+  contraseña  String
+  tipo_usuario String
+  Administrador Administrador?
+  Paciente     Paciente?
+  Profesional  Profesional?
+}
+
+model Administrador {
+  id_admin   Int    @id @default(autoincrement())
+  nombres    String
+  apellidos  String
+  dni        String
+  id_usuario Int    @unique
+  Usuario    Usuario @relation(fields: [id_usuario], references: [id_usuario])
+}
+
+model Paciente {
+  id_paciente Int    @id @default(autoincrement())
+  nombres     String
+  apellidos   String
+  dni         String
+  id_usuario  Int    @unique
+  Usuario     Usuario @relation(fields: [id_usuario], references: [id_usuario])
+}
+
+model Profesional {
+  id_profesional Int    @id @default(autoincrement())
+  nombres        String
+  apellidos      String
+  identificacion String
+  id_usuario     Int    @unique
+  Usuario        Usuario @relation(fields: [id_usuario], references: [id_usuario])
+}
+
+model Cita {
+  id_cita      Int        @id @default(autoincrement())
+  id_paciente  Int
+  id_profesional Int
+  fecha        DateTime
+  hora         DateTime
+  Paciente     Paciente @relation(fields: [id_paciente], references: [id_paciente])
+  Profesional  Profesional @relation(fields: [id_profesional], references: [id_profesional])
+}
+
