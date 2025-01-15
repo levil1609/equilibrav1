@@ -8,49 +8,58 @@ generator client {
 }
 
 model Usuario {
-  id_usuario  Int    @id @default(autoincrement())
-  usuario     String @unique
-  contraseña  String
-  tipo_usuario String
-  Administrador Administrador?
+  id           Int      @id @default(autoincrement())
+  usuario      String   @unique
+  contrasena   String
+  tipoUsuario  String   // 'P' para paciente, 'R' para profesional, 'A' para administrador
   Paciente     Paciente?
   Profesional  Profesional?
 }
 
-model Administrador {
-  id_admin   Int    @id @default(autoincrement())
-  nombres    String
-  apellidos  String
-  dni        String
-  id_usuario Int    @unique
-  Usuario    Usuario @relation(fields: [id_usuario], references: [id_usuario])
-}
-
 model Paciente {
-  id_paciente Int    @id @default(autoincrement())
-  nombres     String
-  apellidos   String
-  dni         String
-  id_usuario  Int    @unique
-  Usuario     Usuario @relation(fields: [id_usuario], references: [id_usuario])
+  id           Int       @id @default(autoincrement())
+  nombres      String
+  apellidos    String
+  dni          String    @unique
+  usuarioId    Int       @unique
+  usuario      Usuario   @relation(fields: [usuarioId], references: [id])
+  citas        Cita[]
+  resultados   ResultadoTest[]
 }
 
 model Profesional {
-  id_profesional Int    @id @default(autoincrement())
-  nombres        String
-  apellidos      String
-  identificacion String
-  id_usuario     Int    @unique
-  Usuario        Usuario @relation(fields: [id_usuario], references: [id_usuario])
+  id           Int       @id @default(autoincrement())
+  nombres      String
+  apellidos    String
+  identificacion String  @unique
+  especialidad String
+  usuarioId    Int       @unique
+  usuario      Usuario   @relation(fields: [usuarioId], references: [id])
+  citas        Cita[]
+  pagos        Pago[]
 }
 
 model Cita {
-  id_cita      Int        @id @default(autoincrement())
-  id_paciente  Int
-  id_profesional Int
+  id           Int       @id @default(autoincrement())
   fecha        DateTime
   hora         DateTime
-  Paciente     Paciente @relation(fields: [id_paciente], references: [id_paciente])
-  Profesional  Profesional @relation(fields: [id_profesional], references: [id_profesional])
+  pacienteId   Int
+  profesionalId Int
+  paciente     Paciente   @relation(fields: [pacienteId], references: [id])
+  profesional  Profesional @relation(fields: [profesionalId], references: [id])
 }
 
+model ResultadoTest {
+  id           Int       @id @default(autoincrement())
+  resultado    String
+  pacienteId   Int
+  paciente     Paciente   @relation(fields: [pacienteId], references: [id])
+}
+
+model Pago {
+  id           Int       @id @default(autoincrement())
+  fechaPago    DateTime
+  monto        Float
+  profesionalId Int
+  profesional  Profesional @relation(fields: [profesionalId], references: [id])
+}
